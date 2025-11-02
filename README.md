@@ -1,29 +1,44 @@
 ```mermaid
-flowchart TD
-    %% === STYLE DEFINITIONS ===
-    classDef start fill:#fdf5e6,stroke:#333,stroke-width:1px,color:#000,font-weight:bold;
-    classDef action fill:#d6eaf8,stroke:#2980b9,stroke-width:1px,color:#000;
-    classDef decision fill:#f9e79f,stroke:#b7950b,stroke-width:1px,color:#000;
-    classDef done fill:#d5f5e3,stroke:#27ae60,stroke-width:1px,color:#000,font-weight:bold;
+graph TD
+    %% Nodes
+    DEV[Developer]
+    GH[GitHub - Code + IaC + Dockerfile]
+    GHA[GitHub Actions - CI/CD + SAST + OPA + Build & Push Docker]
+    ECR[Amazon ECR - Container Registry]
+    TF[Terraform - Provision Infra: EC2, IAM, S3]
+    VSM[Vault / Secrets Manager - Inject Secrets]
+    EC2[EC2 Instance - Host]
+    DOCK[Docker - Container Runtime]
+    APP[.NET 8 Application Container]
+    CW[CloudWatch Agent - Logs & Metrics]
+    GD[GuardDuty - Threat Detection]
+    PR[Prometheus Exporter - Metrics Collection]
+    GR[Grafana - Dashboards]
+    CT[CloudTrail - API Activity Logs]
+    SIEM[SIEM - Audit & Compliance]
 
-    %% === MAIN FLOW ===
-    A([Review and Deploy Test environment]):::start -->|PR review| B[Produce InfraCost estimate and post to PR comment]:::action
-    B --> C[Run Checkov and KICS static code analysis and post to PR comment]:::action
-    C --> D[Run Terraform format, init, validate, plan and post to PR comment]:::action
-    A -->|PR merge| E[Run Terraform format, init, validate, plan and apply]:::action
+    %% Flow
+    DEV -->|Push Code & Dockerfile| GH
+    GH -->|Trigger Workflow| GHA
+    GHA -->|Build & Push Image| ECR
+    GHA -->|Apply Infrastructure| TF
+    TF -->|Provision Host| EC2
+    ECR -->|Pull Image| DOCK
+    VSM -->|Inject Secrets| DOCK
+    DOCK -->|Run Application| APP
 
-    %% === ECS Check and Build Flow ===
-    D --> F{Check Amazon ECS Image exists?}:::decision
-    F -->|Image does not exist| G[Update program.cs]:::action
-    F -->|Image exists| H{Check for changes in ./appsrc directory}:::decision
+    %% Monitoring
+    APP --> CW
+    EC2 --> CW
+    EC2 --> GD
+    EC2 --> PR
 
-    H -->|Changes detected| G
-    H -->|No changes detected| Z[Print Web App URL in summary]:::action
+    %% Visualization
+    CW --> GR
+    GD --> GR
+    PR --> GR
 
-    G --> I[Setup .NET environment]:::action
-    I --> J[Build .NET environment]:::action
-    J --> K[Login to Amazon ECR]:::action
-    K --> L[Build, tag and push Docker Image to Amazon ECR]:::action
-    L --> Z
-    Z --> M([END]):::done
-
+    %% Audit & Compliance
+    TF --> CT
+    EC2 --> CT
+    CT --> SIEM
