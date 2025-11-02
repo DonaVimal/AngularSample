@@ -4,7 +4,7 @@ flowchart TD
     classDef start fill:#fdf5e6,stroke:#333,stroke-width:1px,color:#000,font-weight:bold;
     classDef action fill:#d6eaf8,stroke:#2980b9,stroke-width:1px,color:#000;
     classDef decision fill:#f9e79f,stroke:#b7950b,stroke-width:1px,color:#000;
-    classDef end fill:#d5f5e3,stroke:#27ae60,stroke-width:1px,color:#000,font-weight:bold;
+    classDef done fill:#d5f5e3,stroke:#27ae60,stroke-width:1px,color:#000,font-weight:bold;
 
     %% === MAIN FLOW ===
     A([Review and Deploy Test environment]):::start -->|PR review| B[Produce InfraCost estimate and post to PR comment]:::action
@@ -25,12 +25,5 @@ flowchart TD
     J --> K[Login to Amazon ECR]:::action
     K --> L[Build, tag and push Docker Image to Amazon ECR]:::action
     L --> Z
-    Z --> M([END]):::end
+    Z --> M([END]):::done
 
-    %% === OPTIONAL LINKS ===
-    click B "https://www.infracost.io/docs/" "Learn about InfraCost"
-    click C "https://www.checkov.io/" "Checkov documentation"
-    click C "https://docs.kics.io/latest/" "KICS documentation"
-    click D "https://developer.hashicorp.com/terraform/docs" "Terraform docs"
-    click K "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html" "Amazon ECR docs"
-    click L "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html" "Amazon ECS container basics"
